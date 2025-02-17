@@ -6,6 +6,7 @@
       when: ansible_os_family == "Debian"
       become: true
       block:
+
         - name: Downlaod Grafana GPG key for debian
           ansible.builtin.get_url:
             url: https://apt.grafana.com/gpg.key
@@ -26,3 +27,32 @@
               #- grafana-enterprise
             state: present
             update_cache: true
+    
+    - name: Install Grafana on RedHat Systems
+      when: ansible_os_family == "RedHat"
+      become: true
+      block:
+
+        - name: Download the GPG key on RedHat based systems
+          ansible.builtin.get_url:
+            url: https://rpm.grafana.com/gpg.key
+            dest: /etc/pki/rpm-gpg/RPM_GPG_KEY_grafana
+            mode: '0644'
+
+        - name: Add Grafana repository on RedHat based systems
+          ansible.builtin.copy:
+            dest: /etc/yum.repos.d/grafana.repo
+            content: |
+              [grafana]
+              name=grafana
+              baseurl=https://rpm.grafana.com/rpm/stable/x86_64/
+              gpgcheck=1
+              gpgkey=file:///etc/pki/rpm-gpg/RPM_GPG_KEY_grafana
+            mode: '0644'
+
+        - name: Install Grafana
+          ansible.builtin.dnf:
+            pkg:
+              - grafana
+              - grafana-enterprise
+            state: present
