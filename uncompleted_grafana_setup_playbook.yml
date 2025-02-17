@@ -24,7 +24,7 @@
           ansible.builtin.apt:
             pkg:
               - grafana
-              #- grafana-enterprise
+              - grafana-enterprise
             state: present
             update_cache: true
     
